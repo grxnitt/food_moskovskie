@@ -1,0 +1,7 @@
+"use client";
+import { ArrowUpRight, Heart, Star, Footprints } from "lucide-react";
+import type { CatalogDish } from "@/lib/catalog";
+import { rubles, walkText } from "@/lib/client";
+export default function DishCard({ dish, saved, onSave, onOpen }: { dish: CatalogDish; saved: boolean; onSave: () => void; onOpen: () => void }) {
+  return <article className="dish-card"><div className="dish-photo"><button className="photo-link" onClick={onOpen} aria-label={`Подробнее: ${dish.name}`}><img src={dish.image} alt={dish.name} loading="lazy" /><span className="photo-arrow"><ArrowUpRight size={22} /></span></button><button className={`save-button ${saved ? "is-saved" : ""}`} onClick={onSave} aria-label={saved ? `Убрать из избранного: ${dish.name}` : `В избранное: ${dish.name}`} aria-pressed={saved}><Heart size={20} fill={saved ? "currentColor" : "none"} /></button><span className="price-chip">{rubles(dish.price)}</span></div><div className="dish-copy"><button className="dish-title" onClick={onOpen}>{dish.name}</button><p className="venue-name">{dish.venue}<span> · {dish.category === "coffee" ? "Кофе и десерт" : dish.category === "snack" ? "Перекус" : "Обед"}</span></p><p className="dish-address">{dish.address}</p><div className="dish-meta"><span className={dish.rating ? "rating" : "no-rating"}><Star size={15} fill={dish.rating ? "currentColor" : "none"} />{dish.rating ? dish.rating.toFixed(1) : "Пока без оценок"}</span><span><Footprints size={15} />{walkText(dish.walkMinutes)}</span></div></div></article>;
+}

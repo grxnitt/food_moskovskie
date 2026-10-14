@@ -1,0 +1,13 @@
+"use client";
+import { useEffect, useState } from "react";
+import { Check, ArrowUpRight, MapPin } from "lucide-react";
+import { api } from "@/lib/client";
+import Modal from "./Modal";
+type Suggestion = { id: string; name: string; address: string; status: string };
+export default function SuggestPlace({ onClose }: { onClose: () => void }) {
+  const [name, setName] = useState(""); const [address, setAddress] = useState(""); const [note, setNote] = useState(""); const [sending, setSending] = useState(false); const [error, setError] = useState(""); const [success, setSuccess] = useState(false); const [items, setItems] = useState<Suggestion[]>([]);
+  async function load() { try { const data = await api<{ suggestions: Suggestion[] }>("/api/suggestions"); setItems(data.suggestions); } catch (e) { setError((e as Error).message); } }
+  useEffect(() => { load(); }, []);
+  async function submit(event: React.FormEvent) { event.preventDefault(); setSending(true); setError(""); try { await api("/api/suggestions", { method: "POST", body: JSON.stringify({ name, address, note }) }); setSuccess(true); setName(""); setAddress(""); setNote(""); await load(); } catch (e) { setError((e as Error).message); } finally { setSending(false); } }
+  return <Modal title="Предложить место" onClose={onClose} className="suggest-modal"><div className="quiz-icon"><MapPin size={27} /></div><h2>Где вкусно поесть?</h2><p className="muted">Помоги собрать карту района. Предложи место в двух километрах от Московских ворот.</p><form className="review-form" onSubmit={submit}><label>Название<input value={name} onChange={e => setName(e.target.value)} placeholder="Твоя любимая столовая или кофейня" minLength={2} maxLength={100} required /></label><label>Адрес<input value={address} onChange={e => setAddress(e.target.value)} placeholder="Улица и номер дома" minLength={5} maxLength={200} required /></label><label>Что попробовать? <span className="muted">Необязательно</span><textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Любимое блюдо, цена, полезный совет" maxLength={500} rows={3} /></label>{error && <p className="form-error" role="alert">{error}</p>}{success && <div className="form-success" role="status"><Check size={19} /> Место сохранено в предложениях. После проверки оно сможет попасть на карту.</div>}<button disabled={sending} className="button button-dark" type="submit">{sending ? "Сохраняем…" : "Предложить место"}<ArrowUpRight size={18} /></button></form>{items.length > 0 && <div className="my-suggestions"><h3>Твои предложения</h3>{items.map(i => <article key={i.id}><div><strong>{i.name}</strong><small>{i.address}</small></div><span>На проверке</span></article>)}</div>}</Modal>;
+}

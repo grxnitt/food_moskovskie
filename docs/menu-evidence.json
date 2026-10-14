@@ -1,0 +1,32 @@
+{
+  "roll": {
+    "name": "Ролл с цыплёнком",
+    "image": "https://s3.outsource.store/tseh-hosted-content/pictures/159038.png?refresh=639069234038500000",
+    "snippet": "<h4>Ролл с цыплёнком</h4><div class=\"description\"></div><span>279<i class=\"currency\">₽</i></span></div></div><style data-emotion-css=\"1d31ing\">.css-1d31ing{min-width:200px;min-height:320px;cursor:pointer;-webkit-transiti"
+  },
+  "pasta": {
+    "name": "Паста Болоньезе с говядиной",
+    "image": "https://s3.outsource.store/tseh-hosted-content/pictures/158258.png?refresh=639075332014600000",
+    "snippet": "<h4>Паста Болоньезе с говядиной</h4><div class=\"description\"></div><span>319<i class=\"currency\">₽</i></span></div></div><style data-emotion-css=\"1wtbh2h\">.css-1wtbh2h{min-width:200px;min-height:320px;cursor:pointer;-webk"
+  },
+  "soba": {
+    "name": "Соба с курицей и овощами",
+    "image": "https://s3.outsource.store/tseh-hosted-content/pictures/161462.png?refresh=639264698615430000",
+    "snippet": "<h4>Соба с курицей и овощами</h4><div class=\"description\"></div><span>299<i class=\"currency\">₽</i></span></div></div><style data-emotion-css=\"gzt979\">.css-gzt979{min-width:200px;min-height:320px;cursor:pointer;-webkit-tr"
+  },
+  "soup": {
+    "name": "Грибной крем-суп",
+    "image": "https://s3.outsource.store/tseh-hosted-content/pictures/147101.png?refresh=638557339949100000",
+    "snippet": "<h4>Грибной крем-суп</h4><div class=\"description\"></div><span>239<i class=\"currency\">₽</i></span></div></div><style data-emotion-css=\"1gan9a3\">.css-1gan9a3{min-width:200px;min-height:320px;cursor:pointer;-webkit-transiti"
+  },
+  "cheesecakes": {
+    "name": "Сырники",
+    "image": "https://s3.outsource.store/tseh-hosted-content/pictures/143268.png?refresh=638875791475200000",
+    "snippet": "<h4>Сырники</h4><div class=\"description\"></div><span>189<i class=\"currency\">₽</i></span></div></div><style data-emotion-css=\"1l4er4d\">.css-1l4er4d{min-width:200px;min-height:320px;cursor:pointer;-webkit-transition:all 0."
+  },
+  "coffee": {
+    "name": "Капучино",
+    "image": "https://s3.outsource.store/tseh-hosted-content/pictures/143211.png?refresh=638486464139000000",
+    "snippet": "<h4>Капучино</h4><div class=\"description\"></div><span>229<i class=\"currency\">₽</i></span></div></div><style data-emotion-css=\"y1lwnu\">.css-y1lwnu{min-width:200px;min-height:320px;cursor:pointer;-webkit-transition:all 0.4"
+  }
+}
