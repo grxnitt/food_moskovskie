@@ -1,12 +1,13 @@
+import { withBackend } from "@/lib/backend";
 import { database, json, errorResponse, identity, guard, validString, readObject } from "@/lib/server";
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   if (!identity(request)) return json({ suggestions: [] });
   try {
     const { results } = await database().prepare("SELECT id, name, address, note, status, created_at AS createdAt FROM suggestions WHERE owner_id = ? ORDER BY created_at DESC LIMIT 30").bind(identity(request)).all();
     return json({ suggestions: results });
   } catch { return errorResponse(); }
 }
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   const denied = guard(request); if (denied) return denied;
   try {
     const data = await readObject(request);
@@ -18,3 +19,6 @@ export async function POST(request: Request) {
     return json({ ok: true, id }, 201);
   } catch { return errorResponse(); }
 }
+
+export const GET = withBackend(handleGET);
+export const POST = withBackend(handlePOST);

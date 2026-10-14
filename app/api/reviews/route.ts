@@ -1,6 +1,7 @@
+import { withBackend } from "@/lib/backend";
 import { dishes } from "@/lib/catalog";
 import { database, json, errorResponse, guard, identity, validString, readObject } from "@/lib/server";
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   const dishId = new URL(request.url).searchParams.get("dishId");
   if (!dishes.some(d => d.id === dishId)) return json({ error: "Блюдо не найдено" }, 404);
   try {
@@ -9,7 +10,7 @@ export async function GET(request: Request) {
     return json({ reviews: results });
   } catch { return errorResponse(); }
 }
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   const denied = guard(request); if (denied) return denied;
   try {
     const data = await readObject(request);
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     return json({ ok: true }, 201);
   } catch { return errorResponse(); }
 }
-export async function DELETE(request: Request) {
+async function handleDELETE(request: Request) {
   const denied = guard(request); if (denied) return denied;
   try {
     const { dishId } = await readObject(request);
@@ -30,3 +31,7 @@ export async function DELETE(request: Request) {
     return json({ ok: true });
   } catch { return errorResponse(); }
 }
+
+export const GET = withBackend(handleGET);
+export const POST = withBackend(handlePOST);
+export const DELETE = withBackend(handleDELETE);

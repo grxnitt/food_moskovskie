@@ -1,6 +1,7 @@
+import { withBackend } from "@/lib/backend";
 import { dishes, enrichDish, CHECKED_AT } from "@/lib/catalog";
 import { database, json, errorResponse } from "@/lib/server";
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   try {
     const params = new URL(request.url).searchParams;
     const budget = Number(params.get("budget") || 100000);
@@ -13,3 +14,5 @@ export async function GET(request: Request) {
     return json({ dishes: items, checkedAt: CHECKED_AT });
   } catch { return errorResponse(); }
 }
+
+export const GET = withBackend(handleGET);

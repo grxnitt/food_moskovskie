@@ -38,28 +38,47 @@
 
 Предложения мест сохраняются со статусом pending. Автоматической публикации непроверенных адресов нет; отдельная панель редактора в эту версию не включена. Владелец может просмотреть записи таблицы suggestions через инструменты базы Sites и после проверки добавить место в каталог.
 
-## Запуск
+## Запуск и Vercel
 
-Требуется Node.js 22.13+.
+Требуется Node.js 22.13+. Стандартные команды теперь используют Next.js и создают `.next/routes-manifest.json`, который ожидает Vercel.
 
 ```sh
 git clone https://github.com/grxnitt/food_moskovskie.git
 cd food_moskovskie
 npm ci
 npm run build
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_tearful_dracula.sql
-npm run dev
+npm start
 ```
 
-Миграцию применяют один раз к пустой локальной базе. Preview: http://127.0.0.1:5173/ . Для проверки собранного Worker: `npm start -- --port 5174`.
+Адрес локальной версии: http://127.0.0.1:3000/ . Для разработки: `npm run dev`.
 
-В локальной разработке сессия анонимная, если не включена штатная имитация входа. На закрытом размещённом сайте личность поставляет платформа Sites. При публикации Sites применяет миграции к размещённой базе.
+Для API Next.js нужны серверные переменные `PEREMENA_BACKEND_URL` и `PEREMENA_BACKEND_TOKEN`. Они настроены в проекте владельца на Vercel. Для локального запуска создайте `.env.local` по образцу `.env.example` и укажите ключ только локально. Ключ нельзя публиковать в GitHub, передавать клиенту или добавлять префикс `NEXT_PUBLIC_`.
+
+Интерфейс и API-слой Next.js работают на Vercel. Запросы к данным идут с сервера Vercel в существующий закрытый backend Sites / Cloudflare D1. База не заменяется локальным файлом или памятью функции. Без настроенного подключения API возвращает ошибку 503; фиктивных ответов нет.
+
+Прокси передаёт только собственную cookie `peremena_session`, а не cookie авторизации Vercel или входящие заголовки идентификации пользователя. В браузере Vercel избранное и право изменять отзыв связаны с этой сессией. Каталог и опубликованные отзывы хранятся в общей D1. Правила закрытого доступа задаёт платформа Vercel; исходный сайт Sites остаётся закрытым.
+
+`vercel.json` явно задаёт Next.js, `npm ci`, `npm run build` и `.next`. Подробности: [docs/vercel.md](docs/vercel.md).
+
+### Нативный запуск Cloudflare / Sites
+
+Исходные обработчики и миграции D1 сохранены. Отдельные команды для этого целевого окружения:
+
+```sh
+npm run build:sites
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_tearful_dracula.sql
+npm run dev:sites
+```
+
+Миграцию применяют один раз к пустой локальной базе. Preview Sites: http://127.0.0.1:5173/ . Для собранного Worker: `npm run start:sites -- --port 5174`.
+
+Локальная и размещённая базы разделены; применение локальной миграции не меняет размещённые данные. При наличии нативной привязки D1 сервер выполняет исходные обработчики напрямую. Next.js подменяет только модуль окружения Cloudflare на Node-адаптер, не импортируя `cloudflare:workers` в Vercel Functions.
 
 ## Проверки
 
 ```sh
 npx tsc --noEmit
-node --test tests/api.test.mjs
+npm test
 npm run build
 ```
 

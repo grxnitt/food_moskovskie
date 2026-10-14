@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:5173';
+const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:3000';
 async function session() { const r = await fetch(base + '/api/session'); assert.equal(r.status,200); return r.headers.get('set-cookie')?.split(';')[0] || ''; }
 async function call(path,cookie,body,method='POST',origin=base) { return fetch(base+path,{method,headers:{'Content-Type':'application/json',Origin:origin,Cookie:cookie},body:JSON.stringify(body)}); }
 async function read(path,cookie='') { const r=await fetch(base+path,{headers:{Cookie:cookie}}); assert.equal(r.status,200); return r.json(); }
@@ -23,14 +23,15 @@ test('real API: filters, persistence, ownership, ratings and validation', async 
   await call('/api/favorites',one,{dishId:'roll',saved:false}); assert.deepEqual((await read('/api/favorites',one)).favorites,[]);
  });
  await t.test('reviews create, update, aggregate and delete with owner isolation',async()=>{
+  const baseline=(await read('/api/reviews?dishId=roll',one)).reviews;
   const body={dishId:'roll',author:'Автоматическая проверка',rating:4,body:'Служебный тест сохранения. Будет удалён после проверки.'};
   assert.equal((await call('/api/reviews',one,body)).status,201);
   let own=await read('/api/reviews?dishId=roll',one); assert.equal(own.reviews.find(r=>r.author===body.author).mine,1);
   const other=await read('/api/reviews?dishId=roll',two); assert.equal(other.reviews.find(r=>r.author===body.author).mine,0);
   await call('/api/reviews',two,{dishId:'roll'},'DELETE'); assert.equal((await read('/api/reviews?dishId=roll',one)).reviews.length,own.reviews.length);
   await call('/api/reviews',one,{...body,rating:5}); own=await read('/api/reviews?dishId=roll',one); assert.equal(own.reviews.filter(r=>r.mine).length,1); assert.equal(own.reviews.find(r=>r.mine).rating,5);
-  const {dishes}=await read('/api/catalog'); const roll=dishes.find(d=>d.id==='roll'); assert.equal(roll.rating,5); assert.equal(roll.reviewCount,1);
-  await call('/api/reviews',one,{dishId:'roll'},'DELETE'); assert.equal((await read('/api/reviews?dishId=roll',one)).reviews.length,0);
+  const {dishes}=await read('/api/catalog'); const roll=dishes.find(d=>d.id==='roll'); assert.equal(roll.rating,Math.round((baseline.reduce((sum,r)=>sum+r.rating,0)+5)/(baseline.length+1)*10)/10); assert.equal(roll.reviewCount,baseline.length+1);
+  await call('/api/reviews',one,{dishId:'roll'},'DELETE'); assert.equal((await read('/api/reviews?dishId=roll',one)).reviews.length,baseline.length);
   assert.equal((await call('/api/reviews',one,{...body,rating:6})).status,400);
   assert.equal((await call('/api/reviews',one,{...body,body:'x'})).status,400);
  });

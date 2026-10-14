@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { env } from "@/lib/runtime";
 export function database() {
   if (!env.DB) throw new Error("База данных недоступна");
   return env.DB;
